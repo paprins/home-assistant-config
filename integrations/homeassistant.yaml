@@ -1,0 +1,14 @@
+---
+# Sets up Home Assistant.
+#
+# Basically, everything that doesn't have to be in the
+# main configuration.yaml.
+#
+homeassistant:
+  name: Home
+  latitude: 51.882791877229316
+  longitude: 4.223271204497402
+  country: NL
+  time_zone: "Europe/Amsterdam"
+  unit_system: metric
+  currency: EUR

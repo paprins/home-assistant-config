@@ -1,6 +1,10 @@
+---
+#
+# Set of binary_sensors to help with Playstation state
+#
 - platform: template
   sensors:
-    is_ps4_powered_on:
+    is_ps5_powered_on:
       value_template: "{{ states('sensor.shelly_plug_007_power')|int() > 1.0 }}"
       friendly_name: "Playstation powered on"
 
@@ -17,8 +21,8 @@
       friendly_name: "TV standby"
 
 - platform: history_stats
-  name: PS4 ON today
-  entity_id: sensor.is_ps4_powered_on
+  name: PS5 ON today
+  entity_id: sensor.is_ps5_powered_on
   state: True
   type: time
   start: "{{ now().replace(hour=0, minute=0, second=0) }}"
@@ -33,7 +37,7 @@
   end: "{{ now() }}"
 
 #
-# HELPERS
+# Calculate device 'on' in minutes.
 #
 - platform: template
   sensors:
@@ -43,7 +47,6 @@
 
 - platform: template
   sensors:
-    ps4_on_today_in_minutes:
-      value_template: "{{ (states('sensor.ps4_on_today') | float * 60) | int }}"
-      friendly_name: "PS4 on (minutes)"
-# # # # # #
+    ps5_on_today_in_minutes:
+      value_template: "{{ (states('sensor.ps5_on_today') | float * 60) | int }}"
+      friendly_name: "ps5 on (minutes)"

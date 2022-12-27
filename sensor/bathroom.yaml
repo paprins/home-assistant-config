@@ -1,7 +1,0 @@
-- platform: statistics
-  name: Bathroom Humidity Average Linear 24h
-  entity_id: sensor.badkamer_humidity
-  state_characteristic: average_linear
-  sampling_size: 50
-  max_age:
-    hours: 24
