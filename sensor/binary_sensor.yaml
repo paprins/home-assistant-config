@@ -1,0 +1,49 @@
+- platform: template
+  sensors:
+    is_ps4_powered_on:
+      value_template: "{{ states('sensor.shelly_plug_007_power')|int() > 1.0 }}"
+      friendly_name: "Playstation powered on"
+
+- platform: template
+  sensors:
+    is_tv_powered_on:
+      value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 65 }}"
+      friendly_name: "TV powered on"
+
+- platform: template
+  sensors:
+    is_tv_on_standby:
+      value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 1.0 and states('sensor.shelly_plug_006_power')|int() < 65 }}"
+      friendly_name: "TV standby"
+
+- platform: history_stats
+  name: PS4 ON today
+  entity_id: sensor.is_ps4_powered_on
+  state: True
+  type: time
+  start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+  end: "{{ now() }}"
+
+- platform: history_stats
+  name: TV ON today
+  entity_id: sensor.is_tv_powered_on
+  state: True
+  type: time
+  start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+  end: "{{ now() }}"
+
+#
+# HELPERS
+#
+- platform: template
+  sensors:
+    tv_on_today_in_minutes:
+      value_template: "{{ (states('sensor.tv_on_today') | float * 60) | int }}"
+      friendly_name: "TV on (minutes)"
+
+- platform: template
+  sensors:
+    ps4_on_today_in_minutes:
+      value_template: "{{ (states('sensor.ps4_on_today') | float * 60) | int }}"
+      friendly_name: "PS4 on (minutes)"
+# # # # # #

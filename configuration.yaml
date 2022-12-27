@@ -1,0 +1,42 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+homeassistant:
+  name: Home
+  latitude: 51.882791877229316
+  longitude: 4.223271204497402
+  country: NL
+  time_zone: "Europe/Amsterdam"
+  unit_system: metric
+  currency: EUR
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 10.0.1.20
+    - 10.0.1.52
+    - 10.0.1.0/24
+  ip_ban_enabled: false
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+logger:
+  default: info
+  logs:
+    homeassistant.components.rest: debug
+
+# Text to speech
+tts:
+  - platform: google_translate
+    language: "nl"
+    cache: true
+    cache_dir: /tmp/tts
+    time_memory: 57600
+    service_name: google_say
+
+sensor: !include_dir_merge_list sensor
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

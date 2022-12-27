@@ -1,0 +1,157 @@
+esphome:
+  name: orconmv
+  comment: Orcon woonhuisventilator MVS-15RHBP
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Fallback hotspot
+  ap:
+    ssid: "OrconWifiController"
+    password: "12341234"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+i2c:
+
+#
+# Wemos D1 Mini pinlayout
+#
+# 01 -> RST = reset
+# 02 -> AB  = power on
+# 03 -> D0  = wake
+# 04 -> D5  = Current fanspeed rpm
+# 05 -> D6  = PWM output to fan
+# 06 -> D7  = Input from factory PCB (PWM)
+# 07 -> D8  = orcon mv relay
+# 08 -> 3V3 =
+# 09 -> TX  =
+# 10 -> RX  =
+# 11 -> D1  = SCL for temperature/humidity
+# 12 -> D2  = SDA for temperature/humidity
+# 13 -> D3  =
+# 14 -> D4  =
+# 15 -> GND =
+# 16 -> 5V  =
+#
+
+switch:
+  # Controls the relay that decides whether to use OUR pwm or that of the
+  # actual unit.
+  - platform: gpio
+    id: orcon_mv_control_relay
+    internal: false
+    name: "Orcon MV Control relay"
+    pin:
+      number: D8
+      inverted: False
+
+  # In case of weird behaviour
+  - platform: restart
+    name: "Orcon MV ESPHome Restart"
+
+binary_sensor:
+  # This input_boolean will dictate whether to completely override any default
+  # behaviour.
+  # Turning this ON will set the speed to the INPUT_NUMBER below
+  # Turning this OFF will set the speed to the HIGHER of the INPUT_NUMBER and
+  # the SENSED PWM (requested speed) from the ORCON UNIT.
+  - platform: homeassistant
+    name: "Orcon MV HA Override"
+    id: orcon_mv_ha_override
+    entity_id: input_boolean.orcon_override
+    internal: true
+
+sensor:
+  # This input_number will be the requested speed by Home Assistant or
+  # its automations.
+  - platform: homeassistant
+    id: ha_requested_speed
+    internal: true
+    entity_id: input_number.orcon_speed_override
+
+  # Counts pulses/minute from the tachometer in the fan.
+  # ~ current_speed
+  - platform: pulse_counter
+    pin: D5
+    name: Orcon Fan Tachometer
+    id: orcon_mv_tachometer
+    update_interval: 5s
+    accuracy_decimals: 0
+    internal_filter: 250us
+    unit_of_measurement: rpm
+
+  - platform: bme280
+    temperature:
+      name: "orcon_mv_temp"
+      oversampling: 16x
+    pressure:
+      name: "orcon_mv_pressure"
+    humidity:
+      name: "orcon_mv_humidity"
+    address: 0x76
+    update_interval: 10s
+
+    # Duty Cycle >
+    # Stand 1: 15%
+    # Stand 2: 70%
+    # Stand 3: 78%
+  - platform: duty_cycle
+    name: "Orcon MV Requested speed"
+    id: orcon_mv_requested_speed
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: no
+    update_interval: 5s
+    filters:
+      lambda: "return int(x);"
+
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(orcon_mv_ha_override).state;'
+            then:
+              - lambda: |-
+                  id(orcon_mv_pwm_out).set_level(
+                    int(id(ha_requested_speed).state)/100.0
+                  );
+                  id(orcon_mv_control_relay).turn_on();
+            else:
+              - lambda: |-
+                  float or_rs = float(id(orcon_mv_requested_speed).state);
+                  float ha_rs = float(int(id(ha_requested_speed).state));
+                  // +5(%) .. Close enough
+                  if ((or_rs + 5.0) >= ha_rs) {
+                      id(orcon_mv_control_relay).turn_off();
+                      id(orcon_mv_pwm_out).set_level(0.0);
+                  } else {
+                      id(orcon_mv_pwm_out).set_level(
+                          max(
+                              or_rs / 100.0,
+                              ha_rs / 100.0
+                          )
+                      );
+                      id(orcon_mv_control_relay).turn_on();
+                  }
+output:
+  # Define the actual PWM output pin
+  - platform: esp8266_pwm
+    pin: D6
+    frequency: 1000 Hz
+    id: orcon_mv_pwm_out
+    inverted: true

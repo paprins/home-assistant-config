@@ -1,0 +1,53 @@
+new_script_2:
+  alias: Sonos Say (TTS)
+  icon: mdi:speaker-message
+  sequence:
+  - service: sonos.snapshot
+    data_template:
+      entity_id: '{{ player }}'
+  - service: media_player.media_stop
+    data_template:
+      entity_id: '{{ player }}'
+  - delay:
+      seconds: 1
+  - service: media_player.volume_set
+    data_template:
+      entity_id: '{{ player }}'
+    data:
+      volume_level: '{{ volumelevel }}'
+  - service: tts.google_say
+    data_template:
+      entity_id: '{{ player }}'
+      message: '{{ message_to_say }}'
+  - delay:
+      seconds: 1
+  - delay: "{% set duration = state_attr(player, 'media_duration') %} {% if duration
+      > 0 %}\n  {% set duration = duration - 1 %}\n{% endif %} {% set seconds = duration
+      % 60 %} {% set minutes = (duration / 60)|int % 60 %} {% set hours = (duration
+      / 3600)|int %} {{ [hours, minutes, seconds]|join(':') }}"
+  - delay:
+      milliseconds: 500
+  - service: sonos.restore
+    data_template:
+      entity_id: '{{ player }}'
+  mode: single
+reset_sonos_source:
+  alias: Reset Sonos Source
+  sequence:
+  - service: media_player.volume_set
+    data_template:
+      entity_id: '{{ entity_id }}'
+      volume_level: 0
+  - service: media_player.select_source
+    data_template:
+      entity_id: '{{ entity_id }}'
+      source: '{{ source }}'
+  - service: media_player.media_stop
+    data_template:
+      entity_id: '{{ entity_id }}'
+  - service: media_player.volume_set
+    data_template:
+      entity_id: '{{ entity_id }}'
+      volume_level: 0.1
+  mode: single
+  icon: mdi:music
