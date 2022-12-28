@@ -1,0 +1,67 @@
+#
+# Set of binary_sensors to help with Playstation state
+#
+binary_sensor:
+  - platform: template
+    sensors:
+      is_ps5_powered_on:
+        value_template: "{{ states('sensor.shelly_plug_007_power')|int() > 1.0 }}"
+        friendly_name: "Playstation powered on"
+
+  - platform: template
+    sensors:
+      is_tv_powered_on:
+        value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 65 }}"
+        friendly_name: "TV powered on"
+
+  - platform: template
+    sensors:
+      is_tv_on_standby:
+        value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 1.0 and states('sensor.shelly_plug_006_power')|int() < 65 }}"
+        friendly_name: "TV standby"
+
+sensor:
+  - platform: history_stats
+    name: PS5 ON today
+    entity_id: sensor.is_ps5_powered_on
+    state: True
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: TV ON today
+    entity_id: sensor.is_tv_powered_on
+    state: True
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  #
+  # Calculate device 'on' in minutes.
+  #
+  - platform: template
+    sensors:
+      tv_on_today_in_minutes:
+        value_template: "{{ (states('sensor.tv_on_today') | float * 60) | int }}"
+        friendly_name: "TV on (minutes)"
+
+  - platform: template
+    sensors:
+      ps5_on_today_in_minutes:
+        value_template: "{{ (states('sensor.ps5_on_today') | float * 60) | int }}"
+        friendly_name: "ps5 on (minutes)"
+
+  - platform: afvalwijzer
+    provider: mijnafvalwijzer
+    postal_code: 3238BA
+    street_number: 17
+    exclude_pickup_today: false
+
+  - platform: statistics
+    name: Bathroom Humidity Average Linear 24h
+    entity_id: sensor.badkamer_humidity
+    state_characteristic: average_linear
+    sampling_size: 50
+    max_age:
+      hours: 24
