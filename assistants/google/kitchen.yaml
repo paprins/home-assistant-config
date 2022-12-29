@@ -1,7 +1,6 @@
 ---
 #
 # List of entities that is exposed to Google Assistant
-# Area: Living Room
+# Area: Keuken
 #
-- light.woonkamer
-- climate.woonkamer
+- light.keuken

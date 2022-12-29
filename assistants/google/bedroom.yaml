@@ -1,0 +1,9 @@
+---
+#
+# List of entities that is exposed to Google Assistant
+# Area: All Bedrooms
+#
+- climate.isis_slaapkamer
+- climate.nova_slaapkamer
+- climate.tygo_slaapkamer
+- climate.master_bedroom
