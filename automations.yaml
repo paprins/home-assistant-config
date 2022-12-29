@@ -1,161 +1,165 @@
-- id: '1667909240129'
+- id: "1667909240129"
   alias: Notify if Playstation time is up
-  description: ''
+  description: ""
   trigger:
-  - platform: numeric_state
-    entity_id: sensor.ps4_on_today_in_minutes
-    above: 119
+    - platform: numeric_state
+      entity_id: sensor.ps5_on_today_in_minutes
+      above: 119
   condition:
-  - condition: template
-    value_template: '{{ state_attr(''automation.notify_is_playstation_time_is_up'',''last_triggered'')
-      | default(today_at(), true) < today_at(''08:00'') }}'
+    - condition: template
+      value_template:
+        "{{ state_attr('automation.notify_is_playstation_time_is_up','last_triggered')
+        | default(today_at(), true) < today_at('08:00') }}"
   action:
-  - service: tts.google_say
-    data:
-      entity_id: media_player.game_room
-      message: Dit is een geautomatiseerd bericht. De Playstation wordt al 2 uur gebruikt.
-        Wil je zo afsluiten?
-  - service: notify.pushover
-    data:
-      message: De Playstation wordt al 2 uur gebruikt.
-      target: iphone14
+    - service: tts.google_say
+      data:
+        entity_id: media_player.game_room
+        message:
+          Dit is een geautomatiseerd bericht. De Playstation wordt al 2 uur gebruikt.
+          Wil je zo afsluiten?
+    - service: notify.pushover
+      data:
+        message: De Playstation wordt al 2 uur gebruikt.
+        target: iphone14
   mode: single
-- id: '1667909317506'
+- id: "1667909317506"
   alias: Turn on HVAC
   description: Turn on HVAC in bathroom when humidity above threshold.
   trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.snzb_02_bathroom_humidity
-    above: input_number.bathroom_humidity_threshold
+    - platform: numeric_state
+      entity_id:
+        - sensor.snzb_02_bathroom_humidity
+      above: input_number.bathroom_humidity_threshold
   condition:
-  - condition: time
-    after: 06:00:00
-    before: '23:59:00'
+    - condition: time
+      after: 06:00:00
+      before: "23:59:00"
   action:
-  - service: input_number.set_value
-    data:
-      value: 85
-    target:
-      entity_id: input_number.orcon_speed_override
-  - service: notify.pushover
-    data:
-      message: 'Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
-        ventilator AAN'
-      target: iphone14
+    - service: input_number.set_value
+      data:
+        value: 85
+      target:
+        entity_id: input_number.orcon_speed_override
+    - service: notify.pushover
+      data:
+        message:
+          "Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
+          ventilator AAN"
+        target: iphone14
   mode: single
-- id: '1667909343118'
+- id: "1667909343118"
   alias: Turn off HVAC
   description: Turn off HVAC in bathroom when humidity below threshold.
   trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.snzb_02_bathroom_humidity
-    below: input_number.bathroom_humidity_threshold
-    for:
-      minutes: 5
+    - platform: numeric_state
+      entity_id:
+        - sensor.snzb_02_bathroom_humidity
+      below: input_number.bathroom_humidity_threshold
+      for:
+        minutes: 5
   condition:
-  - condition: time
-    after: 06:00:00
-    before: '23:59:00'
+    - condition: time
+      after: 06:00:00
+      before: "23:59:00"
   action:
-  - service: input_number.set_value
-    data:
-      value: 0
-    target:
-      entity_id: input_number.orcon_speed_override
-  - service: notify.pushover
-    data:
-      message: 'Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
-        ventilator UIT'
-      target: iphone14
+    - service: input_number.set_value
+      data:
+        value: 0
+      target:
+        entity_id: input_number.orcon_speed_override
+    - service: notify.pushover
+      data:
+        message:
+          "Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
+          ventilator UIT"
+        target: iphone14
   mode: single
-- id: '1667909651029'
+- id: "1667909651029"
   alias: Office On/Off (daily)
   description: Turn Office on/off
   trigger:
-  - platform: state
-    entity_id:
-    - schedule.office_schedule
+    - platform: state
+      entity_id:
+        - schedule.office_schedule
   condition:
-  - '{{ trigger.to_state.state in [''on'', ''off''] }}'
+    - "{{ trigger.to_state.state in ['on', 'off'] }}"
   action:
-  - service: switch.turn_{{ trigger.to_state.state }}
-    data: {}
-    target:
-      entity_id: switch.shelly_plug_005
+    - service: switch.turn_{{ trigger.to_state.state }}
+      data: {}
+      target:
+        entity_id: switch.shelly_plug_005
   mode: single
-- id: '1667909678362'
+- id: "1667909678362"
   alias: Reset Sonos (daily)
   description: Reset Sonos
   trigger:
-  - platform: time
-    at: 01:00:00
+    - platform: time
+      at: 01:00:00
   action:
-  - service: script.reset_sonos_source
-    data:
-      entity_id: media_player.keuken
-      source: NPO Radio 2
-  - wait_template: '{{ is_state(''script.reset_sonos_source'', ''off'') }}'
+    - service: script.reset_sonos_source
+      data:
+        entity_id: media_player.keuken
+        source: NPO Radio 2
+    - wait_template: "{{ is_state('script.reset_sonos_source', 'off') }}"
   mode: single
-- id: '1667941717069'
+- id: "1667941717069"
   alias: Turn off HVAC at night
-  description: ''
+  description: ""
   trigger:
-  - platform: time
-    at: 00:00:00
+    - platform: time
+      at: 00:00:00
   condition: []
   action:
-  - service: switch.turn_off
-    data: {}
-    target:
-      entity_id: switch.orcon_mv_control_relay
-  - service: input_number.set_value
-    data:
-      value: 0
-    target:
-      entity_id: input_number.orcon_speed_override
+    - service: switch.turn_off
+      data: {}
+      target:
+        entity_id: switch.orcon_mv_control_relay
+    - service: input_number.set_value
+      data:
+        value: 0
+      target:
+        entity_id: input_number.orcon_speed_override
   mode: single
-- id: '1669747502193'
+- id: "1669747502193"
   alias: Play sound on Sonos when Alarm is triggered
   description: Play sound on Sonos when Alarm is triggered
   trigger:
-  - platform: device
-    device_id: 6e3f1658393fdb3a0b92d00021acc939
-    domain: alarm_control_panel
-    entity_id: alarm_control_panel.home
-    type: triggered
+    - platform: device
+      device_id: 6e3f1658393fdb3a0b92d00021acc939
+      domain: alarm_control_panel
+      entity_id: alarm_control_panel.home
+      type: triggered
   condition: []
   action:
-  - service: media_player.volume_set
-    data:
-      volume_level: 0.7
-    target:
-      entity_id: media_player.eetkamer
-  - repeat:
-      until:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: alarm_control_panel.home
-          state: disarmed
-        - condition: state
-          entity_id: alarm_control_panel.home
-          state: unknown
-      sequence:
-      - service: media_player.play_media
-        target:
-          entity_id: media_player.eetkamer
-        data:
-          media_content_id: media-source://media_source/local/mixkit-sound-alert-in-hall-1006.wav
-          media_content_type: audio/x-wav
-        metadata:
-          title: mixkit-sound-alert-in-hall-1006.wav
-          thumbnail:
-          media_class: music
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: app
-            media_content_id: media-source://media_source
+    - service: media_player.volume_set
+      data:
+        volume_level: 0.7
+      target:
+        entity_id: media_player.eetkamer
+    - repeat:
+        until:
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: alarm_control_panel.home
+                state: disarmed
+              - condition: state
+                entity_id: alarm_control_panel.home
+                state: unknown
+        sequence:
+          - service: media_player.play_media
+            target:
+              entity_id: media_player.eetkamer
+            data:
+              media_content_id: media-source://media_source/local/mixkit-sound-alert-in-hall-1006.wav
+              media_content_type: audio/x-wav
+            metadata:
+              title: mixkit-sound-alert-in-hall-1006.wav
+              thumbnail:
+              media_class: music
+              children_media_class:
+              navigateIds:
+                - {}
+                - media_content_type: app
+                  media_content_id: media-source://media_source
   mode: single
