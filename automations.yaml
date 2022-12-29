@@ -22,7 +22,7 @@
   mode: single
 - id: '1667909317506'
   alias: Turn on HVAC
-  description: Turn on HVAC in bathroom when humidity above 70%
+  description: Turn on HVAC in bathroom when humidity above threshold.
   trigger:
   - platform: numeric_state
     entity_id:
@@ -40,13 +40,13 @@
       entity_id: input_number.orcon_speed_override
   - service: notify.pushover
     data:
-      message: 'Vochtigheid is {{ states.sensor.badkamer_humidity.state }}: ventilator
-        AAN'
+      message: 'Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
+        ventilator AAN'
       target: iphone14
   mode: single
 - id: '1667909343118'
   alias: Turn off HVAC
-  description: Turn off HVAC in bathroom when humidity below 70%
+  description: Turn off HVAC in bathroom when humidity below threshold.
   trigger:
   - platform: numeric_state
     entity_id:
@@ -66,8 +66,8 @@
       entity_id: input_number.orcon_speed_override
   - service: notify.pushover
     data:
-      message: 'Vochtigheid is {{ states.sensor.badkamer_humidity.state }}: ventilator
-        UIT'
+      message: 'Vochtigheid is {{ states.sensor.snzb_02_bathroom_humidity.state }}:
+        ventilator UIT'
       target: iphone14
   mode: single
 - id: '1667909651029'
@@ -97,39 +97,6 @@
       entity_id: media_player.keuken
       source: NPO Radio 2
   - wait_template: '{{ is_state(''script.reset_sonos_source'', ''off'') }}'
-  mode: single
-- id: '1667914577569'
-  alias: Dismiss login failure notifications from specific IPs
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - persistent_notification.http_login
-    to: notifying
-  condition:
-  - condition: template
-    value_template: "{% set ns = namespace(ips=[\"10.0.1.35\", \"10.0.1.51\"], found=false)
-      %}\n{% for ip in ns.ips if (\"(\" ~ ip ~ \")\") in state_attr(\"persistent_notification.http_login\",\"message\")
-      %}\n  {% set ns.found = true %}\n{% endfor %}\n{{ ns.found }}"
-  action:
-  - delay: 00:00:01
-  - service: persistent_notification.dismiss
-    data:
-      notification_id: http-login
-  mode: single
-- id: '1667914687042'
-  alias: Dismiss login failure notifications
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - persistent_notification.http_login
-    to: notifying
-  action:
-  - delay: 00:00:01
-  - service: persistent_notification.dismiss
-    data:
-      notification_id: http-login
   mode: single
 - id: '1667941717069'
   alias: Turn off HVAC at night
