@@ -34,6 +34,13 @@ new_script_2:
 reset_sonos_source:
   alias: Reset Sonos Source
   sequence:
+  - service: media_player.unjoin
+    data_template:
+      entity_id: '{{ entity_id }}'
+  - service: media_player.join
+    data_template:
+      master: '{{ entity_id }}'
+    entity_id: all
   - service: media_player.volume_set
     data_template:
       entity_id: '{{ entity_id }}'

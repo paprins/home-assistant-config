@@ -91,6 +91,12 @@
   trigger:
   - platform: time
     at: 01:00:00
+  condition:
+  - alias: Sonos is not playing
+    not:
+    - condition: state
+      entity_id: media_player.keuken
+      state: Playing
   action:
   - service: script.reset_sonos_source
     data:
