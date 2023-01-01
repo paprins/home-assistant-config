@@ -1,0 +1,21 @@
+---
+alias: "Battery Alerts"
+description: >-
+  Notify when a devices needs to be charged.
+mode: single
+trigger:
+  - platform: numeric_state
+    entity_id:
+      - sensor.pascals_iphone_battery_level
+    value_template: "{{ state.attributes.battery_level }}"
+    below: 30
+condition:
+  - condition: template
+    value_template: "{{ states('input_boolean.battery_alerts') == 'on' }}"
+action:
+  - service: notify.pushover
+    data:
+      message: >-
+        Battery percentage is {{ state.attributes.battery_level }}%
+        Time to charge!!
+      target: iphone14
