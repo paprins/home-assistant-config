@@ -38,11 +38,6 @@
       value: 85
     target:
       entity_id: input_number.orcon_speed_override
-  - service: notify.pushover
-    data:
-      message: 'Vochtigheid is {{ states.sensor.th_bathroom_humidity.state }}: ventilator
-        AAN'
-      target: iphone14
   mode: single
 - id: '1667909343118'
   alias: Turn off HVAC
@@ -64,11 +59,6 @@
       value: 0
     target:
       entity_id: input_number.orcon_speed_override
-  - service: notify.pushover
-    data:
-      message: 'Vochtigheid is {{ states.sensor.th_bathroom_humidity.state }}: ventilator
-        UIT'
-      target: iphone14
   mode: single
 - id: '1667909651029'
   alias: Office On/Off (daily)
