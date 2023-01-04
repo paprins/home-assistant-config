@@ -5,34 +5,50 @@ binary_sensor:
   - platform: template
     sensors:
       is_ps5_powered_on:
-        value_template: "{{ states('sensor.shelly_plug_007_power')|int() > 1.0 }}"
+        value_template: "{{ states.sensor.shelly_plug_007_power.state|int(-1) > 1.0 }}"
         friendly_name: "Playstation powered on"
 
   - platform: template
     sensors:
       is_tv_powered_on:
-        value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 65 }}"
+        value_template: "{{ states.sensor.shelly_plug_006_power.state|int(-1) > 65 }}"
         friendly_name: "TV powered on"
 
   - platform: template
     sensors:
       is_tv_on_standby:
-        value_template: "{{ states('sensor.shelly_plug_006_power')|int() > 1.0 and states('sensor.shelly_plug_006_power')|int() < 65 }}"
+        value_template: "{{ states.sensor.shelly_plug_006_power.state|int(-1) > 1.0 and states.sensor.shelly_plug_006_power.state|int(-1) < 65 }}"
         friendly_name: "TV standby"
 
 sensor:
   - platform: history_stats
+    name: PS5 ON today count
+    entity_id: sensor.is_ps5_powered_on
+    state: "true"
+    type: count
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
     name: PS5 ON today
     entity_id: sensor.is_ps5_powered_on
-    state: True
+    state: "true"
     type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: TV ON today count
+    entity_id: sensor.is_tv_powered_on
+    state: "true"
+    type: count
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
     name: TV ON today
     entity_id: sensor.is_tv_powered_on
-    state: True
+    state: "true"
     type: time
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"

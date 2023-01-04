@@ -1,0 +1,8 @@
+---
+# Using a 'custom_component' for now. This component will probably be part of 'core' soon.
+#
+# See PR: https://github.com/home-assistant/core/pull/83886
+#
+# https://www.home-assistant.io/integrations/energyzero/
+#
+energyzero:

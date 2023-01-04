@@ -1,0 +1,7 @@
+---
+sensor:
+  - platform: prijsplafond
+    sources_total_power:
+      - sensor.energy_consumed_tariff_1
+      - sensor.energy_consumed_tariff_2
+    source_total_gas: sensor.gas_consumed
