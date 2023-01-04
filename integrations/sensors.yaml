@@ -22,33 +22,25 @@ binary_sensor:
 
 sensor:
   - platform: history_stats
-    name: PS5 ON today count
-    entity_id: sensor.is_ps5_powered_on
-    state: "true"
-    type: count
-    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
-    end: "{{ now() }}"
-
-  - platform: history_stats
     name: PS5 ON today
-    entity_id: sensor.is_ps5_powered_on
-    state: "true"
+    entity_id: binary_sensor.is_ps5_powered_on
+    state: "on"
     type: time
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
     name: TV ON today count
-    entity_id: sensor.is_tv_powered_on
-    state: "true"
+    entity_id: binary_sensor.is_tv_powered_on
+    state: "on"
     type: count
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
     name: TV ON today
-    entity_id: sensor.is_tv_powered_on
-    state: "true"
+    entity_id: binary_sensor.is_tv_powered_on
+    state: "on"
     type: time
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"
