@@ -1,0 +1,89 @@
+esphome:
+  name: "hello-epaper"
+  comment: "My first e-ink display"
+  on_boot:
+      priority: 200.0
+      then:
+        - component.update: eink_display
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Wifi information
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "shellyplug"
+    password: "Welkom01"
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+captive_portal:
+
+# Define colors
+# This design is white on black so this is necessary.
+color:
+  - id: color_bg
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 0%
+  - id: color_text
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 100%
+  - id: color_red
+    red: 100%
+    green: 0%
+    blue: 0%
+    white: 0%
+
+# Pins for Waveshare ePaper ESP Board
+spi:
+  clk_pin: 13
+  mosi_pin: 14
+
+font:
+  - file: "gfonts://Mukta"
+    id: font_text
+    size: 32
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz'>?/&"
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_title
+    size: 54
+    # glyphs: ['W', 'E', 'A', 'T', 'H', 'R', 'L', 'I', 'N', ' ']
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_medium_bold
+    size: 30
+    # glyphs: [' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'M', 'I', 'N']
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_small_bold
+    size: 18
+
+# Now render everything on the ePaper screen.
+display:
+  - platform: waveshare_epaper
+    id: eink_display
+    cs_pin: 15
+    dc_pin: 27
+    busy_pin: 25
+    reset_pin: 26
+    reset_duration: 2ms
+    update_interval: never
+    model: 7.50inV2alt
+    rotation: 90°
+    lambda: |-
+      int x = 36;
+      it.printf(x, 40, id(font_text), "Hello World !");
