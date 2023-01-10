@@ -1,0 +1,25 @@
+---
+#
+# This packages sets up all resources for Isis Bedroom.
+#
+binary_sensor:
+  - platform: template
+    sensors:
+      is_gamepc_on:
+        value_template: "{{ states.sensor.shelly_plug_014_power.state|float(0.0) > 10.0 }}"
+        friendly_name: "Game PC on"
+
+sensor:
+  - platform: history_stats
+    name: gamepc_on_today
+    entity_id: binary_sensor.is_gamepc_on
+    state: "on"
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  - platform: template
+    sensors:
+      gamepc_on_today_in_minutes:
+        value_template: "{{ (states('sensor.gamepc_on_today') | float(0.0) * 60) | int }}"
+        friendly_name: "Game PC on (minutes)"
