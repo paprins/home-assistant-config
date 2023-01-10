@@ -39,8 +39,9 @@ reset_sonos_source:
       entity_id: '{{ entity_id }}'
   - service: media_player.join
     data_template:
-      master: '{{ entity_id }}'
-    entity_id: all
+      entity_id: '{{ entity_id }}'
+      group_members:
+      - '{{ entity_id }}'
   - service: media_player.volume_set
     data_template:
       entity_id: '{{ entity_id }}'
